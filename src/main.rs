@@ -15,7 +15,13 @@ use tracing_error::ErrorLayer;
 use tracing_subscriber::{
     filter::EnvFilter, fmt, layer::SubscriberExt, util::SubscriberInitExt, Registry,
 };
+use chrono::prelude::*;
 
+
+/*
+如果要使用log反馈测试，请在下面User完善代码
+ */
+//可修改范围的开始
 struct User;
 
 impl Default for User{
@@ -29,6 +35,10 @@ impl User{
         Self
     }
 }
+//可修改范围的结束
+/*
+下面的main中还有可修改的位置
+ */
 
 
 #[instrument]
@@ -42,7 +52,10 @@ fn main() -> Result<()> {
     let formatting_layer = fmt::layer().pretty().with_writer(std::io::stderr);
 
     // 输出到文件中
-    let file_appender = rolling::never("logs", "app.log");
+    let time: DateTime<Local> = Local::now();
+    // let time: DateTime<Utc> = Utc::now();
+    let file_name = format!("{}-{}-{}-{}-{}.log", time.year(), time.month(), time.day(), time.hour(), time.minute());
+    let file_appender = rolling::never("logs", file_name);
     let (non_blocking_appender, _guard) = non_blocking(file_appender);
     let file_layer = fmt::layer()
         .with_ansi(false)
