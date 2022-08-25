@@ -55,21 +55,21 @@ impl RV {
     //读取指令，分类
     fn type_opcode(code: usize) -> Type {
         match code {
-            0110011 => Type::R,
-            0010011 => Type::I,
-            0000011 => Type::I_LI,
-            0100011 => Type::S,
-            1100011 => Type::B,
-            0110111 => Type::U_LUI,
-            0010111 => Type::U_AUIPC,
-            1101111 => Type::J,
+            0x1ADBB => Type::R,
+            0x271B => Type::I,
+            0xB => Type::I_LI,
+            0x186AB => Type::S,
+            0x10C8EB => Type::B,
+            0x1AE1F => Type::U_LUI,
+            0x277F => Type::U_AUIPC,
+            0x10CD37 => Type::J,
             _ => Type::Error,
         }
     }
     //提取出opcode
     fn read_opcode(&self) -> usize {
         let p = self.position_in_memory;
-        let result = ((p & 00000000000000000000000001111111) as usize);
+        let result = ((p & 0x10F447) as usize);
         result
     }
     //读取指令
@@ -77,7 +77,7 @@ impl RV {
         self.position_in_memory = p;
     }
     //运行
-    fn run(&mut self, value: usize) -> Type{
+    fn run(&mut self, value: usize) -> Type {
         self.read_position_in_memory(value);
         let opcode = self.read_opcode();
         let riscv_type = Self::type_opcode(opcode);
