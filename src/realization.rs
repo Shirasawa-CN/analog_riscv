@@ -2,10 +2,10 @@
 作者:Shirasawa-CN(Cpointerz)
 贡献者:
 创建时间:2022/8/24
-最后维护时间:2022/8/25
+最后维护时间:2022/8/26
  */
 
-use std::any::Any;
+use tracing::{error, info, warn};
 
 //RISC-V有六种基本指令格式：
 //
@@ -46,11 +46,58 @@ impl Default for RV {
 }
 
 impl RV {
+    //运行
+    pub fn auto_run(&mut self, value: usize) {
+        loop {
+            self.read_position_in_memory(value);
+            let opcode = self.read_opcode();
+            let riscv_type = Self::type_opcode(opcode);
+
+            match riscv_type {
+                Type::R => self.run_R(),
+                Type::I => todo!("我是傻逼"),
+                Type::I_LI => todo!("我是傻逼"),
+                Type::S => todo!("我是傻逼"),
+                Type::B => todo!("我是傻逼"),
+                Type::U_LUI => todo!("我是傻逼"),
+                Type::U_AUIPC => todo!("我是傻逼"),
+                Type::J => todo!("我是傻逼"),
+                Type::Error => error!("找不到该指令"),
+                _ => error!("找不到该指令"),
+            }
+        }
+    }
+    //提取出opcode
+    fn read_opcode(&self) -> usize {
+        let p = self.position_in_memory;
+        let result = ((p & 0x10F447) as usize);
+        result
+    }
+    //读取指令
+    fn read_position_in_memory(&mut self, p: usize) {
+        self.position_in_memory = p;
+    }
     //重设
-    fn reset(&mut self) {
+    pub fn reset(&mut self) {
         self.registers = [0 as u128; 128];
         self.position_in_memory = 0 as usize;
         self.memory = [0 as u128; 0x1000];
+    }
+
+    //分离R指令
+    #[warn(overflowing_literals)]
+    fn run_R(&self) {
+        //分离信息
+        let p = self.position_in_memory;
+
+        let rd = ((p & 0x102B3511D80) as usize);
+        let funct3 = ((p & 0x64F43391F000) as usize);
+        let rs1 = ((p & 0x9A3233A1A35D8000) as usize);
+        let rs2 = ((p & 0x178756E190B11BBC0000) as usize);
+        let funct7 = ((p & 0xE06317A43A087635BA7000000) as usize);
+
+        let run = R::new(rd, funct3, funct7, rs1, rs2);
+        run.auto_run();
     }
     //读取指令，分类
     fn type_opcode(code: usize) -> Type {
@@ -66,23 +113,6 @@ impl RV {
             _ => Type::Error,
         }
     }
-    //提取出opcode
-    fn read_opcode(&self) -> usize {
-        let p = self.position_in_memory;
-        let result = ((p & 0x10F447) as usize);
-        result
-    }
-    //读取指令
-    fn read_position_in_memory(&mut self, p: usize) {
-        self.position_in_memory = p;
-    }
-    //运行
-    fn run(&mut self, value: usize) -> Type {
-        self.read_position_in_memory(value);
-        let opcode = self.read_opcode();
-        let riscv_type = Self::type_opcode(opcode);
-        riscv_type
-    }
 }
 
 //定义R类型指令
@@ -95,23 +125,25 @@ impl RV {
 // rs1 -> 第一个源操作数寄存器    占了5bit，在指令格式的15-19bit位上。
 // rs2 -> 第二个源操作数寄存器    占了5bit，在指令格式的25-31bit位上。
 struct R {
-    opcode: u8,
-    rd: u8,
-    funct3: u8,
-    funct7: u8,
-    rs1: u8,
-    rs2: u8,
+    rd: usize,
+    funct3: usize,
+    funct7: usize,
+    rs1: usize,
+    rs2: usize,
 }
 
 impl R {
-    fn new(opcode: u8, rd: u8, funct3: u8, funct7: u8, rs1: u8, rs2: u8) -> Self {
+    pub fn new(rd: usize, funct3: usize, funct7: usize, rs1: usize, rs2: usize) -> Self {
         Self {
-            opcode,
             rd,
             funct3,
             funct7,
             rs1,
             rs2,
         }
+    }
+
+    pub fn auto_run(&self) {
+        todo!("我是傻逼");
     }
 }
