@@ -5,19 +5,18 @@
 最后维护时间:2022/8/25
  */
 
-mod realization;
-use crate::realization::*;
-
+use chrono::prelude::*;
 use color_eyre::{eyre::eyre, Result};
 use tracing::{error, info, instrument};
 use tracing_appender::{non_blocking, rolling};
 use tracing_error::ErrorLayer;
 use tracing_subscriber::{
-    filter::EnvFilter, fmt, layer::SubscriberExt, util::SubscriberInitExt, Registry,
+    filter::EnvFilter, fmt, layer::SubscriberExt, Registry, util::SubscriberInitExt,
 };
-use chrono::prelude::*;
 
+use crate::realization::*;
 
+mod realization;
 /*
 如果要使用log反馈测试，请在下面User完善代码
  */
@@ -39,12 +38,6 @@ impl User{
 /*
 下面的main中还有可修改的位置
  */
-
-
-#[instrument]
-fn return_err() -> Result<()> {
-    Err(eyre!("Something went wrong"))
-}
 
 fn main() -> Result<()> {
     let env_filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"));

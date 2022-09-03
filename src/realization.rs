@@ -2,7 +2,6 @@
 作者:Shirasawa-CN(Cpointerz)
 贡献者:
 创建时间:2022/8/24
-最后维护时间:2022/8/26
  */
 
 use anyhow::Result;
@@ -30,7 +29,7 @@ enum Type {
 
 //定义RISC-V的数据结构
 struct RV {
-    registers: [u128; 128],
+    registers: [u64; 64],
     //定义寄存器
     position_in_memory: String,
     //定义记录内存位置
@@ -40,7 +39,7 @@ struct RV {
 impl Default for RV {
     fn default() -> Self {
         Self {
-            registers: [0; 128],
+            registers: [0; 64],
             position_in_memory: String::new(),
             memory: [0; 0x1000],
         }
@@ -54,9 +53,10 @@ impl RV {
             self.read_position_in_memory(&value);
             let opcode = self.read_opcode();
             let riscv_type = Self::type_opcode(opcode);
+            let code = String::from(opcode);
 
             match riscv_type {
-                Type::R => Self::run_R(),
+                Type::R => Self::run_R(code),
                 Type::I => todo!("我是傻逼"),
                 Type::I_LI => todo!("我是傻逼"),
                 Type::S => todo!("我是傻逼"),
@@ -81,7 +81,7 @@ impl RV {
     }
     //重设
     pub fn reset(&mut self) {
-        self.registers = [0 as u128; 128];
+        self.registers = [0 as u64; 64];
         self.position_in_memory = String::new();
         self.memory = [0 as u128; 0x1000];
     }
@@ -99,9 +99,9 @@ impl RV {
             _ => Type::Error,
         }
     }
-    fn run_R() {
-        let run = R::default();
-        run.auto_run();
+    fn run_R(code: String) {
+        let mut run = R::default();
+        run.binary_auto_run(code);
     }
 }
 
@@ -110,12 +110,13 @@ impl RV {
 // opcode -> 操作码   占了7bit，在指令格式的0-6bit位上
 // R类型的操作码为0110011
 // rd -> 目标寄存器     占了5bit，在指令格式的7-11bit位上
-// funct3 funct7 -> 两个操作字段     funct3占了3bit，在指令格式的12-14bit位上；funct7占了7bit，在指令格式的25-31bit位上。
+// funct3 funct7 -> 两个操作字段     funct3占了3bit，在指令格式的12-14bit位上；funct7占了7bit，在指令格式的20-26bit位上。
 // 操作字符add sub sll slt sltu xor srl sra or and
 // rs1 -> 第一个源操作数寄存器    占了5bit，在指令格式的15-19bit位上。
-// rs2 -> 第二个源操作数寄存器    占了5bit，在指令格式的25-31bit位上。
+// rs2 -> 第二个源操作数寄存器    占了5bit，在指令格式的27-31bit位上。
 #[derive(Default)]
 struct R {
+    code: String,
     rd: usize,
     funct3: usize,
     funct7: usize,
@@ -124,7 +125,39 @@ struct R {
 }
 
 impl R {
-    pub fn auto_run(&self) {
-        todo!("我是傻逼");
+    //输入指令
+    fn input_code(&mut self, code: String) {
+        self.code = String::from(code);
     }
+    //分离信息
+    fn get_info(&mut self) {
+        self.rd = String::from(&self.code[21..25]).parse().unwrap();
+        self.funct3 = String::from(&self.code[18..20]).parse().unwrap();
+        self.rs1 = String::from(&self.code[13..17]).parse().unwrap();
+        self.funct7 = String::from(&self.code[6..12]).parse().unwrap();
+        self.rs2 = String::from(&self.code[0..5]).parse().unwrap();
+    }
+    //运行函数
+    pub fn binary_auto_run(&mut self, code: String) {
+        self.input_code(code);
+        self.get_info();
+    }
+
+    /*
+    以下是对汇编的实现
+     */
+    fn asm_add(&self) {
+        todo!()
+        //TODO
+    }
+    fn asm_sub() {}
+    fn asm_sll() {}
+    fn asm_slt() {}
+    fn asm_sltu() {}
+    fn asm_xor() {}
+    fn asm_srl() {}
+    fn asm_sra() {}
+    fn asm_or() {}
+    fn asm_and() {}
+    pub fn asm_auto_run() {}
 }
