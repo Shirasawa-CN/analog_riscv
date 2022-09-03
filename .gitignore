@@ -4,3 +4,4 @@
 /.vscode
 /.fleet
 /pictures/.$analog_riscv_map.drawio.bkp
+Cargo.lock
