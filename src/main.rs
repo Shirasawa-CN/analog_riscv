@@ -6,15 +6,12 @@
  */
 
 use chrono::prelude::*;
-use color_eyre::{eyre::eyre, Result};
-use tracing::{error, info, instrument};
+use color_eyre::Result;
 use tracing_appender::{non_blocking, rolling};
 use tracing_error::ErrorLayer;
 use tracing_subscriber::{
     filter::EnvFilter, fmt, layer::SubscriberExt, Registry, util::SubscriberInitExt,
 };
-
-use crate::realization::*;
 
 mod realization;
 /*
@@ -23,14 +20,14 @@ mod realization;
 //可修改范围的开始
 struct User;
 
-impl Default for User{
+impl Default for User {
     fn default() -> Self {
         Self
     }
 }
 
-impl User{
-    fn new(self) -> Self{
+impl User {
+    fn new(self) -> Self {
         Self
     }
 }
@@ -47,7 +44,14 @@ fn main() -> Result<()> {
     // 输出到文件中
     let time: DateTime<Local> = Local::now();
     // let time: DateTime<Utc> = Utc::now();
-    let file_name = format!("{}-{}-{}-{}-{}.log", time.year(), time.month(), time.day(), time.hour(), time.minute());
+    let file_name = format!(
+        "{}-{}-{}-{}-{}.log",
+        time.year(),
+        time.month(),
+        time.day(),
+        time.hour(),
+        time.minute()
+    );
     let file_appender = rolling::never("logs", file_name);
     let (non_blocking_appender, _guard) = non_blocking(file_appender);
     let file_layer = fmt::layer()
@@ -67,7 +71,7 @@ fn main() -> Result<()> {
     color_eyre::install()?;
 
     //可修改的位置
-    let user = User::default();
+    let _user = User::default();
     //let user = User::new();
 
     Ok(())

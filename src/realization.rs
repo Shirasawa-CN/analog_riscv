@@ -4,8 +4,9 @@
 创建时间:2022/8/24
  */
 
-use anyhow::Result;
-use tracing::{error, info, warn};
+
+
+use tracing::error;
 
 //RISC-V有六种基本指令格式：
 //
@@ -29,8 +30,8 @@ enum Type {
 
 //定义RISC-V的数据结构
 struct RV {
-    registers: [u64; 64],
     //定义寄存器
+    registers: [i64; 64],
     position_in_memory: String,
     //定义记录内存位置
     memory: [u128; 0x1000],
@@ -48,7 +49,7 @@ impl Default for RV {
 
 impl RV {
     //运行
-    pub fn auto_run(&mut self, value: String) {
+    pub fn binary_auto_run(&mut self, value: String) {
         loop {
             self.read_position_in_memory(&value);
             let opcode = self.read_opcode();
@@ -56,7 +57,7 @@ impl RV {
             let code = String::from(opcode);
 
             match riscv_type {
-                Type::R => Self::run_R(code),
+                Type::R => Self::binary_run_R(code),
                 Type::I => todo!("我是傻逼"),
                 Type::I_LI => todo!("我是傻逼"),
                 Type::S => todo!("我是傻逼"),
@@ -81,7 +82,7 @@ impl RV {
     }
     //重设
     pub fn reset(&mut self) {
-        self.registers = [0 as u64; 64];
+        self.registers = [0 as i64; 64];
         self.position_in_memory = String::new();
         self.memory = [0 as u128; 0x1000];
     }
@@ -99,7 +100,7 @@ impl RV {
             _ => Type::Error,
         }
     }
-    fn run_R(code: String) {
+    fn binary_run_R(code: String) {
         let mut run = R::default();
         run.binary_auto_run(code);
     }
@@ -142,22 +143,40 @@ impl R {
         self.input_code(code);
         self.get_info();
     }
+    pub fn asm_auto_run() {}
+}
 
+#[derive(Default)]
+pub struct ASM;
+
+impl ASM {
     /*
     以下是对汇编的实现
      */
-    fn asm_add(&self) {
-        todo!()
-        //TODO
+    fn mov(self, rd: usize, value: usize, mut riscv: RV) {
+        riscv.registers[rd] = value as i64;
     }
-    fn asm_sub() {}
-    fn asm_sll() {}
-    fn asm_slt() {}
-    fn asm_sltu() {}
-    fn asm_xor() {}
-    fn asm_srl() {}
-    fn asm_sra() {}
-    fn asm_or() {}
-    fn asm_and() {}
-    pub fn asm_auto_run() {}
+    fn add(&self, rd: usize, rs1: usize, rs2: usize, mut riscv: RV) {
+        riscv.registers[rd] = riscv.registers[rs1] + riscv.registers[rs2];
+    }
+    fn sub(&self, rd: usize, rs1: usize, rs2: usize, mut riscv: RV) {
+        riscv.registers[rd] = riscv.registers[rs1] - riscv.registers[rs2];
+    }
+    fn mul(&self, rd: usize, rs1: usize, rs2: usize, mut riscv: RV) {
+        riscv.registers[rd] = riscv.registers[rs1] * riscv.registers[rs2];
+    }
+    fn div(&self, rd: usize, rs1: usize, rs2: usize, mut riscv: RV) {
+        riscv.registers[rd] = (riscv.registers[rs1] / riscv.registers[rs2]) as i64;
+    }
+    fn sll(&self, rd: usize, rs1: usize, rs2: usize, mut riscv: RV) {
+        riscv.registers[rd] = riscv.registers[rs1] << riscv.registers[rs2];
+    }
+    fn srl(&self, rd: usize, rs1: usize, rs2: usize, mut riscv: RV) {
+        riscv.registers[rd] = riscv.registers[rs1] >> riscv.registers[rs2];
+    }
+    fn sltu() {}
+    fn xor() {}
+    fn sra() {}
+    fn or() {}
+    fn and() {}
 }
