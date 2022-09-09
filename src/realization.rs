@@ -146,37 +146,50 @@ impl R {
     pub fn asm_auto_run() {}
 }
 
-#[derive(Default)]
-pub struct ASM;
+pub struct ASM{
+    riscv: RV,
+}
+
+impl Default for ASM{
+    fn default() -> Self {
+        Self{
+            riscv : RV::default(),
+        }
+    }
+}
 
 impl ASM {
     /*
     以下是对汇编的实现
      */
-    fn mov(self, rd: usize, value: usize, mut riscv: RV) {
-        riscv.registers[rd] = value as i64;
+    fn mov(&mut self, rd: usize, value: usize) {
+        self.riscv.registers[rd] = value as i64;
     }
-    fn add(&self, rd: usize, rs1: usize, rs2: usize, mut riscv: RV) {
-        riscv.registers[rd] = riscv.registers[rs1] + riscv.registers[rs2];
+    fn add(&mut self, rd: usize, rs1: usize, rs2: usize) {
+        self.riscv.registers[rd] = self.riscv.registers[rs1] + self.riscv.registers[rs2];
     }
-    fn sub(&self, rd: usize, rs1: usize, rs2: usize, mut riscv: RV) {
-        riscv.registers[rd] = riscv.registers[rs1] - riscv.registers[rs2];
+    fn sub(&mut self, rd: usize, rs1: usize, rs2: usize) {
+        self.riscv.registers[rd] = self.riscv.registers[rs1] - self.riscv.registers[rs2];
     }
-    fn mul(&self, rd: usize, rs1: usize, rs2: usize, mut riscv: RV) {
-        riscv.registers[rd] = riscv.registers[rs1] * riscv.registers[rs2];
+    fn mul(&mut self, rd: usize, rs1: usize, rs2: usize) {
+        self.riscv.registers[rd] = self.riscv.registers[rs1] * self.riscv.registers[rs2];
     }
-    fn div(&self, rd: usize, rs1: usize, rs2: usize, mut riscv: RV) {
-        riscv.registers[rd] = (riscv.registers[rs1] / riscv.registers[rs2]) as i64;
+    fn div(&mut self, rd: usize, rs1: usize, rs2: usize) {
+        self.riscv.registers[rd] = (self.riscv.registers[rs1] / self.riscv.registers[rs2]) as i64;
     }
-    fn sll(&self, rd: usize, rs1: usize, rs2: usize, mut riscv: RV) {
-        riscv.registers[rd] = riscv.registers[rs1] << riscv.registers[rs2];
+    fn sll(&mut self, rd: usize, rs1: usize, rs2: usize) {
+        self.riscv.registers[rd] = self.riscv.registers[rs1] << self.riscv.registers[rs2];
     }
-    fn srl(&self, rd: usize, rs1: usize, rs2: usize, mut riscv: RV) {
-        riscv.registers[rd] = riscv.registers[rs1] >> riscv.registers[rs2];
+    fn sra(&mut self, rd: usize, rs1: usize, rs2: usize) {
+        self.riscv.registers[rd] = self.riscv.registers[rs1] >> self.riscv.registers[rs2];
     }
-    fn sltu() {}
-    fn xor() {}
-    fn sra() {}
-    fn or() {}
-    fn and() {}
+    fn xor(&mut self, rd: usize, rs1: usize ,rs2: usize) {
+        self.riscv.registers[rd] = self.riscv.registers[rs1] ^ self.riscv.registers[rs2];
+    }
+    fn or(&mut self, rd: usize, rs1: usize ,rs2: usize) {
+        self.riscv.registers[rd] = self.riscv.registers[rs1] | self.riscv.registers[rs2];
+    }
+    fn and(&mut self, rd: usize, rs1: usize ,rs2: usize) {
+        self.riscv.registers[rd] = self.riscv.registers[rs1] & self.riscv.registers[rs2];
+    }
 }
